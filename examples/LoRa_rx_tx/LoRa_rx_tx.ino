@@ -5,7 +5,6 @@
  * Note that while this send and received using LoRa modulation, it does not do
  * LoRaWAN. For that, see the LoRaWAN_TTN example.
  *
- * This works on the stick, but the output on the screen gets cut off.
 */
 
 
@@ -17,12 +16,12 @@
 // Pause between transmited packets in seconds.
 // Set to zero to only transmit a packet when pressing the user button
 // Will not exceed 1% duty cycle, even if you set a lower value.
-#define PAUSE               300
+#define PAUSE               3
 
 // Frequency in MHz. Keep the decimal point to designate float.
 // Check your own rules and regulations to see what is legal where you are.
-#define FREQUENCY           866.3       // for Europe
-// #define FREQUENCY           905.2       // for US
+//#define FREQUENCY           866.3       // for Europe
+#define FREQUENCY           905.2       // for US
 
 // LoRa bandwidth. Keep the decimal point to designate float.
 // Allowed values are 7.8, 10.4, 15.6, 20.8, 31.25, 41.7, 62.5, 125.0, 250.0 and 500.0 kHz.
@@ -50,7 +49,7 @@ void setup() {
   both.println("Radio init");
   RADIOLIB_OR_HALT(radio.begin());
   // Set the callback function for received packets
-  radio.setDio1Action(rx);
+  radio.setDio0Action(rx, RISING);
   // Set radio parameters
   both.printf("Frequency: %.2f MHz\n", FREQUENCY);
   RADIOLIB_OR_HALT(radio.setFrequency(FREQUENCY));
@@ -61,7 +60,7 @@ void setup() {
   both.printf("TX power: %i dBm\n", TRANSMIT_POWER);
   RADIOLIB_OR_HALT(radio.setOutputPower(TRANSMIT_POWER));
   // Start receiving
-  RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
+  RADIOLIB_OR_HALT(radio.startReceive());
 }
 
 void loop() {
@@ -76,7 +75,7 @@ void loop() {
       return;
     }
     both.printf("TX [%s] ", String(counter).c_str());
-    radio.clearDio1Action();
+    radio.clearDio0Action();
     heltec_led(50); // 50% brightness is plenty for this LED
     tx_time = millis();
     RADIOLIB(radio.transmit(String(counter++).c_str()));
@@ -90,8 +89,9 @@ void loop() {
     // Maximum 1% duty cycle
     minimum_pause = tx_time * 100;
     last_tx = millis();
-    radio.setDio1Action(rx);
-    RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
+    rxFlag = false;   // discard any stale TX-done interrupt
+    radio.setDio0Action(rx, RISING);
+    RADIOLIB_OR_HALT(radio.startReceive());
   }
 
   // If a packet was received, display it and the RSSI and SNR
@@ -102,8 +102,10 @@ void loop() {
       both.printf("RX [%s]\n", rxdata.c_str());
       both.printf("  RSSI: %.2f dBm\n", radio.getRSSI());
       both.printf("  SNR: %.2f dB\n", radio.getSNR());
+    } else {
+      both.printf("RX read fail (%i)\n", _radiolib_status);
     }
-    RADIOLIB_OR_HALT(radio.startReceive(RADIOLIB_SX126X_RX_TIMEOUT_INF));
+    RADIOLIB_OR_HALT(radio.startReceive());
   }
 }
 
