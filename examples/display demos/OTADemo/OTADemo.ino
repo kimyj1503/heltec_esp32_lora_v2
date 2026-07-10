@@ -51,6 +51,8 @@ const char *password     = "[Your Password]";
 
 
 void setup() {
+  heltec_setup();
+  
   WiFi.begin ( ssid, password );
 
   // Wait for connection
