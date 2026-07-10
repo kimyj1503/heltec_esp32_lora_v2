@@ -17,3 +17,18 @@ also known as the Heltec WiFi LoRa 32 V2.
 * [Schematic](https://github.com/user-attachments/files/29872137/WIFI_LoRa_32_V2.1.868-915.pdf)
 
 <img width="300" height="300" alt="Heltec WiFi LoRa 32 V2 board" src="https://github.com/user-attachments/assets/ac9c3585-82a3-4cf9-b42a-7d39dc3b5e77" />
+
+## Examples tested on Wifi Lora 32 v2.1
+* :x:: Not Working
+* :white_check_mark:: Working
+* :grey_question:: Not tested yet
+
+| Example                  | State |
+|--------------------------|:-----------------------------:|
+| LoRaWan_TTN              |                 :grey_question:            |
+| LoRa_rx_tx               |          :white_check_mark:                   |
+| battery_discharge_telnet |                :grey_question:             |
+| deep_sleep_tester        |                :grey_question:             |
+| display_demos            |          :white_check_mark:                   |
+| minimal_demo             |               :grey_question:              |
+| spectrum_analyzer        |               :grey_question:              |
