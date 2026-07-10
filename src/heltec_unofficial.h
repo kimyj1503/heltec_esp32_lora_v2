@@ -22,28 +22,29 @@
 #define BUTTON    GPIO_NUM_0
 #endif
 // LED pin & PWM parameters
-#define LED_PIN   GPIO_NUM_35
+#define LED_PIN   GPIO_NUM_25
 #define LED_FREQ  5000
 #define LED_CHAN  0
 #define LED_RES   8
 // External power control
-#define VEXT      GPIO_NUM_36
+#define VEXT      GPIO_NUM_21
 // Battery voltage measurement
 #define VBAT_CTRL GPIO_NUM_37
 #define VBAT_ADC  GPIO_NUM_1
 // SPI pins
-#define SS        GPIO_NUM_8
-#define MOSI      GPIO_NUM_10
-#define MISO      GPIO_NUM_11
-#define SCK       GPIO_NUM_9
+#define SS        GPIO_NUM_18
+#define MOSI      GPIO_NUM_27
+#define MISO      GPIO_NUM_19
+#define SCK       GPIO_NUM_5
 // Radio pins
-#define DIO1      GPIO_NUM_14
-#define RST_LoRa  GPIO_NUM_12
+#define DIO0      GPIO_NUM_26
+#define DIO1      GPIO_NUM_NC
+#define RST_LoRa  GPIO_NUM_14
 #define BUSY_LoRa GPIO_NUM_13
 // Display pins
-#define SDA_OLED  GPIO_NUM_17
-#define SCL_OLED  GPIO_NUM_18
-#define RST_OLED  GPIO_NUM_21
+#define SDA_OLED  GPIO_NUM_4
+#define SCL_OLED  GPIO_NUM_15
+#define RST_OLED  GPIO_NUM_16
 
 #ifdef HELTEC_WIRELESS_STICK_LITE
   #define HELTEC_NO_DISPLAY
@@ -97,10 +98,10 @@ const uint8_t scaled_voltage[100] = {
     // and use hspi to make it work anyway. See heltec_setup() for the actual SPI setup.
     #include <SPI.h>
     SPIClass* hspi = new SPIClass(HSPI);
-    SX1262 radio = new Module(SS, DIO1, RST_LoRa, BUSY_LoRa, *hspi);
+    SX1276 radio = new Module(SS, DIO0, RST_LoRa, BUSY_LoRa, *hspi);
   #else
     // Default SPI on pins from pins_arduino.h
-    SX1262 radio = new Module(SS, DIO1, RST_LoRa, BUSY_LoRa);
+    SX1276 radio = new Module(SS, DIO0, RST_LoRa, BUSY_LoRa, *hspi);
   #endif
 #endif
 
@@ -234,7 +235,7 @@ void heltec_deep_sleep(int seconds = 0) {
     // .sleep() and then consumes 800 µA more than it should in deep sleep.
     radio.begin();
     // 'false' here is to not have a warm start, we re-init the after sleep.
-    radio.sleep(false);
+    radio.sleep();
   #endif
   // Turn off external power
   heltec_ve(false);
@@ -317,6 +318,8 @@ bool heltec_wakeup_was_timer() {
  * @return float with temperature in degrees celsius.
 */
 float heltec_temperature() {
+  return 0.0f;
+#if 0 //TODO
   float result = 0;
 
   // If temperature for given n below this value,
@@ -362,6 +365,7 @@ float heltec_temperature() {
   #endif
 
   return result;
+#endif
 }
 
 void heltec_display_power(bool on) {
